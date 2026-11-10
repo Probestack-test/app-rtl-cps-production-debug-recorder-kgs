@@ -1,0 +1,1071 @@
+{
+  "info": {
+    "name": "Production Debug Recorder Postman Collection",
+    "description": "Records every command, query, and API call an engineer executes during \nlive production debugging. Captures full context — screen, commands, \noutputs, timing — so incidents can be replayed step by step. Turns \none engineer's debugging session into an organization-wide learning \nasset. Every session is auditable, searchable, and shareable with \nthe team.\n\nOpenAPI version: 3.0.3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://production-debug-recorder-spipnh6wiq-uc.a.run.app/v1",
+      "type": "string",
+      "description": "Override with the base URL of the deployed Kong gateway."
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "q",
+      "value": "",
+      "type": "string",
+      "description": "Full-text query across commands, outputs, and titles."
+    },
+    {
+      "key": "engineerId",
+      "value": "",
+      "type": "string",
+      "description": "Filter by engineer."
+    },
+    {
+      "key": "targetSystem",
+      "value": "",
+      "type": "string",
+      "description": "Filter by system."
+    },
+    {
+      "key": "incidentId",
+      "value": "",
+      "type": "string",
+      "description": "Filter by incident."
+    },
+    {
+      "key": "bookmarkType",
+      "value": "",
+      "type": "string",
+      "description": "Filter by bookmark type."
+    },
+    {
+      "key": "status",
+      "value": "",
+      "type": "string",
+      "description": "Filter by session status."
+    },
+    {
+      "key": "fromDate",
+      "value": "",
+      "type": "string",
+      "description": "Only include sessions started after this time."
+    },
+    {
+      "key": "toDate",
+      "value": "",
+      "type": "string",
+      "description": "Only include sessions started before this time."
+    },
+    {
+      "key": "page",
+      "value": "",
+      "type": "string",
+      "description": "Page number (zero-based)."
+    },
+    {
+      "key": "size",
+      "value": "",
+      "type": "string",
+      "description": "Number of items per page."
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string",
+      "description": "Unique identifier of the debug session."
+    },
+    {
+      "key": "includeOutput",
+      "value": "",
+      "type": "string",
+      "description": "Include command outputs in the response."
+    },
+    {
+      "key": "redacted",
+      "value": "",
+      "type": "string",
+      "description": "Return redacted content (recommended)."
+    }
+  ],
+  "item": [
+    {
+      "name": "Start a new production debug recording session",
+      "request": {
+        "method": "POST",
+        "description": "Start a new production debug recording session\n\nResponses:\n- 201: Debug session started and recording.\n- 400: Response\n- 409: An active debug session already exists for this engineer and target.\n- 500: Response",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "201 Debug session started and recording.",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Start a new production debug recording session\n\nResponses:\n- 201: Debug session started and recording.\n- 400: Response\n- 409: An active debug session already exists for this engineer and target.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "Debug session started and recording.",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "400",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Start a new production debug recording session\n\nResponses:\n- 201: Debug session started and recording.\n- 400: Response\n- 409: An active debug session already exists for this engineer and target.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "400",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "409 An active debug session already exists for this engineer and target.",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Start a new production debug recording session\n\nResponses:\n- 201: Debug session started and recording.\n- 400: Response\n- 409: An active debug session already exists for this engineer and target.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "An active debug session already exists for this engineer and target.",
+          "code": 409,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "500",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Start a new production debug recording session\n\nResponses:\n- 201: Debug session started and recording.\n- 400: Response\n- 409: An active debug session already exists for this engineer and target.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "500",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Search and list past debug sessions",
+      "request": {
+        "method": "GET",
+        "description": "Search and list past debug sessions\n\nResponses:\n- 200: List of matching debug sessions.\n- 400: Response\n- 500: Response",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions?q={{q}}&engineerId={{engineerId}}&targetSystem={{targetSystem}}&incidentId={{incidentId}}&bookmarkType={{bookmarkType}}&status={{status}}&fromDate={{fromDate}}&toDate={{toDate}}&page={{page}}&size={{size}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "{{q}}",
+              "disabled": true,
+              "description": "Full-text query across commands, outputs, and titles."
+            },
+            {
+              "key": "engineerId",
+              "value": "{{engineerId}}",
+              "disabled": true,
+              "description": "Filter by engineer."
+            },
+            {
+              "key": "targetSystem",
+              "value": "{{targetSystem}}",
+              "disabled": true,
+              "description": "Filter by system."
+            },
+            {
+              "key": "incidentId",
+              "value": "{{incidentId}}",
+              "disabled": true,
+              "description": "Filter by incident."
+            },
+            {
+              "key": "bookmarkType",
+              "value": "{{bookmarkType}}",
+              "disabled": true,
+              "description": "Filter by bookmark type."
+            },
+            {
+              "key": "status",
+              "value": "{{status}}",
+              "disabled": true,
+              "description": "Filter by session status."
+            },
+            {
+              "key": "fromDate",
+              "value": "{{fromDate}}",
+              "disabled": true,
+              "description": "Only include sessions started after this time."
+            },
+            {
+              "key": "toDate",
+              "value": "{{toDate}}",
+              "disabled": true,
+              "description": "Only include sessions started before this time."
+            },
+            {
+              "key": "page",
+              "value": "{{page}}",
+              "disabled": true,
+              "description": "Page number (zero-based)."
+            },
+            {
+              "key": "size",
+              "value": "{{size}}",
+              "disabled": true,
+              "description": "Number of items per page."
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 List of matching debug sessions.",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Search and list past debug sessions\n\nResponses:\n- 200: List of matching debug sessions.\n- 400: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions?q={{q}}&engineerId={{engineerId}}&targetSystem={{targetSystem}}&incidentId={{incidentId}}&bookmarkType={{bookmarkType}}&status={{status}}&fromDate={{fromDate}}&toDate={{toDate}}&page={{page}}&size={{size}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{q}}",
+                  "disabled": true,
+                  "description": "Full-text query across commands, outputs, and titles."
+                },
+                {
+                  "key": "engineerId",
+                  "value": "{{engineerId}}",
+                  "disabled": true,
+                  "description": "Filter by engineer."
+                },
+                {
+                  "key": "targetSystem",
+                  "value": "{{targetSystem}}",
+                  "disabled": true,
+                  "description": "Filter by system."
+                },
+                {
+                  "key": "incidentId",
+                  "value": "{{incidentId}}",
+                  "disabled": true,
+                  "description": "Filter by incident."
+                },
+                {
+                  "key": "bookmarkType",
+                  "value": "{{bookmarkType}}",
+                  "disabled": true,
+                  "description": "Filter by bookmark type."
+                },
+                {
+                  "key": "status",
+                  "value": "{{status}}",
+                  "disabled": true,
+                  "description": "Filter by session status."
+                },
+                {
+                  "key": "fromDate",
+                  "value": "{{fromDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started after this time."
+                },
+                {
+                  "key": "toDate",
+                  "value": "{{toDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started before this time."
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}",
+                  "disabled": true,
+                  "description": "Page number (zero-based)."
+                },
+                {
+                  "key": "size",
+                  "value": "{{size}}",
+                  "disabled": true,
+                  "description": "Number of items per page."
+                }
+              ]
+            }
+          },
+          "status": "List of matching debug sessions.",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "400",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Search and list past debug sessions\n\nResponses:\n- 200: List of matching debug sessions.\n- 400: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions?q={{q}}&engineerId={{engineerId}}&targetSystem={{targetSystem}}&incidentId={{incidentId}}&bookmarkType={{bookmarkType}}&status={{status}}&fromDate={{fromDate}}&toDate={{toDate}}&page={{page}}&size={{size}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{q}}",
+                  "disabled": true,
+                  "description": "Full-text query across commands, outputs, and titles."
+                },
+                {
+                  "key": "engineerId",
+                  "value": "{{engineerId}}",
+                  "disabled": true,
+                  "description": "Filter by engineer."
+                },
+                {
+                  "key": "targetSystem",
+                  "value": "{{targetSystem}}",
+                  "disabled": true,
+                  "description": "Filter by system."
+                },
+                {
+                  "key": "incidentId",
+                  "value": "{{incidentId}}",
+                  "disabled": true,
+                  "description": "Filter by incident."
+                },
+                {
+                  "key": "bookmarkType",
+                  "value": "{{bookmarkType}}",
+                  "disabled": true,
+                  "description": "Filter by bookmark type."
+                },
+                {
+                  "key": "status",
+                  "value": "{{status}}",
+                  "disabled": true,
+                  "description": "Filter by session status."
+                },
+                {
+                  "key": "fromDate",
+                  "value": "{{fromDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started after this time."
+                },
+                {
+                  "key": "toDate",
+                  "value": "{{toDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started before this time."
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}",
+                  "disabled": true,
+                  "description": "Page number (zero-based)."
+                },
+                {
+                  "key": "size",
+                  "value": "{{size}}",
+                  "disabled": true,
+                  "description": "Number of items per page."
+                }
+              ]
+            }
+          },
+          "status": "400",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "500",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Search and list past debug sessions\n\nResponses:\n- 200: List of matching debug sessions.\n- 400: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions?q={{q}}&engineerId={{engineerId}}&targetSystem={{targetSystem}}&incidentId={{incidentId}}&bookmarkType={{bookmarkType}}&status={{status}}&fromDate={{fromDate}}&toDate={{toDate}}&page={{page}}&size={{size}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{q}}",
+                  "disabled": true,
+                  "description": "Full-text query across commands, outputs, and titles."
+                },
+                {
+                  "key": "engineerId",
+                  "value": "{{engineerId}}",
+                  "disabled": true,
+                  "description": "Filter by engineer."
+                },
+                {
+                  "key": "targetSystem",
+                  "value": "{{targetSystem}}",
+                  "disabled": true,
+                  "description": "Filter by system."
+                },
+                {
+                  "key": "incidentId",
+                  "value": "{{incidentId}}",
+                  "disabled": true,
+                  "description": "Filter by incident."
+                },
+                {
+                  "key": "bookmarkType",
+                  "value": "{{bookmarkType}}",
+                  "disabled": true,
+                  "description": "Filter by bookmark type."
+                },
+                {
+                  "key": "status",
+                  "value": "{{status}}",
+                  "disabled": true,
+                  "description": "Filter by session status."
+                },
+                {
+                  "key": "fromDate",
+                  "value": "{{fromDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started after this time."
+                },
+                {
+                  "key": "toDate",
+                  "value": "{{toDate}}",
+                  "disabled": true,
+                  "description": "Only include sessions started before this time."
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}",
+                  "disabled": true,
+                  "description": "Page number (zero-based)."
+                },
+                {
+                  "key": "size",
+                  "value": "{{size}}",
+                  "disabled": true,
+                  "description": "Number of items per page."
+                }
+              ]
+            }
+          },
+          "status": "500",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Get the details and full recording of a debug session",
+      "request": {
+        "method": "GET",
+        "description": "Get the details and full recording of a debug session\n\nResponses:\n- 200: Debug session details retrieved successfully.\n- 404: Response\n- 500: Response",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/:sessionId?includeOutput={{includeOutput}}&redacted={{redacted}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            ":sessionId"
+          ],
+          "query": [
+            {
+              "key": "includeOutput",
+              "value": "{{includeOutput}}",
+              "disabled": true,
+              "description": "Include command outputs in the response."
+            },
+            {
+              "key": "redacted",
+              "value": "{{redacted}}",
+              "disabled": true,
+              "description": "Return redacted content (recommended)."
+            }
+          ],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "{{sessionId}}",
+              "description": "Unique identifier of the debug session."
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 Debug session details retrieved successfully.",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Get the details and full recording of a debug session\n\nResponses:\n- 200: Debug session details retrieved successfully.\n- 404: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId?includeOutput={{includeOutput}}&redacted={{redacted}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId"
+              ],
+              "query": [
+                {
+                  "key": "includeOutput",
+                  "value": "{{includeOutput}}",
+                  "disabled": true,
+                  "description": "Include command outputs in the response."
+                },
+                {
+                  "key": "redacted",
+                  "value": "{{redacted}}",
+                  "disabled": true,
+                  "description": "Return redacted content (recommended)."
+                }
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            }
+          },
+          "status": "Debug session details retrieved successfully.",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "404",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Get the details and full recording of a debug session\n\nResponses:\n- 200: Debug session details retrieved successfully.\n- 404: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId?includeOutput={{includeOutput}}&redacted={{redacted}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId"
+              ],
+              "query": [
+                {
+                  "key": "includeOutput",
+                  "value": "{{includeOutput}}",
+                  "disabled": true,
+                  "description": "Include command outputs in the response."
+                },
+                {
+                  "key": "redacted",
+                  "value": "{{redacted}}",
+                  "disabled": true,
+                  "description": "Return redacted content (recommended)."
+                }
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            }
+          },
+          "status": "404",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "500",
+          "originalRequest": {
+            "method": "GET",
+            "description": "Get the details and full recording of a debug session\n\nResponses:\n- 200: Debug session details retrieved successfully.\n- 404: Response\n- 500: Response",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId?includeOutput={{includeOutput}}&redacted={{redacted}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId"
+              ],
+              "query": [
+                {
+                  "key": "includeOutput",
+                  "value": "{{includeOutput}}",
+                  "disabled": true,
+                  "description": "Include command outputs in the response."
+                },
+                {
+                  "key": "redacted",
+                  "value": "{{redacted}}",
+                  "disabled": true,
+                  "description": "Return redacted content (recommended)."
+                }
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            }
+          },
+          "status": "500",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add a bookmark to an active debug session",
+      "request": {
+        "method": "POST",
+        "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            ":sessionId",
+            "bookmarks"
+          ],
+          "variable": [
+            {
+              "key": "sessionId",
+              "value": "{{sessionId}}",
+              "description": "Unique identifier of the debug session."
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "201 Bookmark added successfully.",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId",
+                "bookmarks"
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "Bookmark added successfully.",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "400",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId",
+                "bookmarks"
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "400",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "404",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId",
+                "bookmarks"
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "404",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "409 Session is not active.",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId",
+                "bookmarks"
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "Session is not active.",
+          "code": 409,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        },
+        {
+          "name": "500",
+          "originalRequest": {
+            "method": "POST",
+            "description": "Add a bookmark to an active debug session\n\nResponses:\n- 201: Bookmark added successfully.\n- 400: Response\n- 404: Response\n- 409: Session is not active.\n- 500: Response",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/:sessionId/bookmarks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                ":sessionId",
+                "bookmarks"
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "{{sessionId}}",
+                  "description": "Unique identifier of the debug session."
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "status": "500",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": ""
+        }
+      ]
+    }
+  ]
+}

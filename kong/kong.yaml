@@ -1,0 +1,89 @@
+_format_version: "3.0"
+_transform: true
+
+########################################################
+# SERVICES
+########################################################
+
+services:
+  - name: production-debug-recorder
+    host: production-debug-recorder
+    port: 443
+    protocol: https
+    path: /api
+    retries: 5
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      - name: production-debug-recorder-get-sessions
+        protocols:
+          - https
+          - http
+        methods:
+          - GET
+        hosts:
+          - api.example.com
+        paths:
+          - /sessions
+        strip_path: true
+        preserve_host: false
+        https_redirect_status_code: 426
+      - name: production-debug-recorder-post-sessions
+        protocols:
+          - https
+          - http
+        methods:
+          - POST
+        hosts:
+          - api.example.com
+        paths:
+          - /sessions
+        strip_path: true
+        preserve_host: false
+        https_redirect_status_code: 426
+      - name: production-debug-recorder-get-sessions-sessionid
+        protocols:
+          - https
+          - http
+        methods:
+          - GET
+        hosts:
+          - api.example.com
+        paths:
+          - /sessions/{sessionId}
+        strip_path: true
+        preserve_host: false
+        https_redirect_status_code: 426
+      - name: production-debug-recorder-post-sessions-sessionid-bookmarks
+        protocols:
+          - https
+          - http
+        methods:
+          - POST
+        hosts:
+          - api.example.com
+        paths:
+          - /sessions/{sessionId}/bookmarks
+        strip_path: true
+        preserve_host: false
+        https_redirect_status_code: 426
+
+########################################################
+# PLUGINS
+########################################################
+
+plugins:
+  []
+
+########################################################
+# UPSTREAMS + TARGETS
+########################################################
+
+upstreams:
+  - name: production-debug-recorder
+    algorithm: round-robin
+    slots: 10000
+    targets:
+      - target: api.example.com:443
+        weight: 100
