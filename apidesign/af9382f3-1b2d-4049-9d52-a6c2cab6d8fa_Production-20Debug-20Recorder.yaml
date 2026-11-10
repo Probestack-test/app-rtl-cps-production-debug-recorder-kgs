@@ -1,0 +1,616 @@
+openapi: 3.0.3
+info:
+  title: Production Debug Recorder
+  version: 1.0.0
+  description: |
+    Records every command, query, and API call an engineer executes during 
+    live production debugging. Captures full context — screen, commands, 
+    outputs, timing — so incidents can be replayed step by step. Turns 
+    one engineer's debugging session into an organization-wide learning 
+    asset. Every session is auditable, searchable, and shareable with 
+    the team.
+  contact:
+    name: ForgeSphere Developer Experience
+    email: devex@forgesphere.example.com
+
+servers:
+  - url: https://production-debug-recorder-spipnh6wiq-uc.a.run.app/v1
+    description: Production Server
+  - url: http://localhost:8134/v1
+    description: Local Development Server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Sessions
+    description: Start, record, and manage debugging sessions.
+  - name: Replays
+    description: Replay past debug sessions for learning.
+
+paths:
+  # ==================== 1 & 4. SESSIONS (POST + GET) ====================
+  /sessions:
+    post:
+      tags: [Sessions]
+      summary: Start a new production debug recording session
+      description: |
+        Begins recording an interactive debugging session. Every command, 
+        query, HTTP call, and output is captured with timestamps. The 
+        session automatically links to an incident, ticket, or free-text 
+        context. Recording stops when the engineer explicitly ends the 
+        session or after the max duration.
+      operationId: startDebugSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, engineerId, targetSystem, environment, purpose]
+              properties:
+                title:
+                  type: string
+                  description: "Short description of what's being debugged."
+                  example: "Payment timeout investigation - 2026-10-06"
+                engineerId:
+                  type: string
+                  description: "Engineer running the session."
+                  example: "amit.kumar@forgesphere.example.com"
+                targetSystem:
+                  type: string
+                  description: "System being debugged."
+                  example: "payment-processor"
+                environment:
+                  type: string
+                  enum: [STAGING, PRODUCTION]
+                  description: "Environment being debugged."
+                  example: "PRODUCTION"
+                purpose:
+                  type: string
+                  minLength: 20
+                  description: "Why the session is being run (min 20 chars)."
+                  example: "Investigating 5xx spike on /charge endpoint since 14:00 UTC."
+                incidentId:
+                  type: string
+                  description: "Optional incident reference."
+                  example: "INC-2050"
+                maxDurationMinutes:
+                  type: integer
+                  minimum: 15
+                  maximum: 480
+                  default: 120
+                  description: "Maximum session duration (auto-stops after this)."
+                  example: 120
+                captureMode:
+                  type: string
+                  enum: [COMMANDS_ONLY, COMMANDS_AND_OUTPUT, FULL_TERMINAL, SHELL_AND_HTTP]
+                  default: COMMANDS_AND_OUTPUT
+                  description: "What to record."
+                  example: "SHELL_AND_HTTP"
+                redactPatterns:
+                  type: array
+                  description: "Regex patterns to redact from recording."
+                  items:
+                    type: string
+                  example: ["password=.*", "token=.*", "\\b\\d{16}\\b"]
+                shareWith:
+                  type: array
+                  description: "Engineers or teams who can view the replay."
+                  items:
+                    type: string
+                  example: ["payments-team", "sre-team@forgesphere.example.com"]
+      responses:
+        '201':
+          description: Debug session started and recording.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebugSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: An active debug session already exists for this engineer and target.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      tags: [Replays]
+      summary: Search and list past debug sessions
+      description: |
+        Full-text search across all past debug sessions — commands, outputs, 
+        bookmarks, and metadata. Used by engineers to find "how did someone 
+        fix this before?" and by managers to measure debugging patterns 
+        across the team.
+      operationId: searchDebugSessions
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Full-text query across commands, outputs, and titles."
+          example: "thread pool exhaustion"
+        - name: engineerId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Filter by engineer."
+          example: "amit.kumar@forgesphere.example.com"
+        - name: targetSystem
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Filter by system."
+          example: "payment-processor"
+        - name: incidentId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Filter by incident."
+          example: "INC-2050"
+        - name: bookmarkType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [MILESTONE, ROOT_CAUSE, FIX_APPLIED, WARNING, DEAD_END, INSIGHT]
+          description: "Filter by bookmark type."
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [RECORDING, COMPLETED, ABORTED]
+          description: "Filter by session status."
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: "Only include sessions started after this time."
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: "Only include sessions started before this time."
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: "Page number (zero-based)."
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: "Number of items per page."
+      responses:
+        '200':
+          description: List of matching debug sessions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== 2. GET SESSION DETAILS ====================
+  /sessions/{sessionId}:
+    get:
+      tags: [Sessions]
+      summary: Get the details and full recording of a debug session
+      description: |
+        Returns the complete debug session — every captured command, query, 
+        HTTP call, output, timing, and any annotations the engineer added. 
+        Sessions are immutable after they end.
+      operationId: getDebugSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: "Unique identifier of the debug session."
+          example: "9c8f1a3b-6d7e-4a12-8f5e-123456789abc"
+        - name: includeOutput
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: "Include command outputs in the response."
+          example: true
+        - name: redacted
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: "Return redacted content (recommended)."
+          example: true
+      responses:
+        '200':
+          description: Debug session details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebugSession'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== 3. ADD A BOOKMARK ====================
+  /sessions/{sessionId}/bookmarks:
+    post:
+      tags: [Sessions]
+      summary: Add a bookmark to an active debug session
+      description: |
+        Bookmarks an important moment in the session — a discovered root 
+        cause, a critical command, or a "aha" moment. Bookmarks appear in 
+        the final replay as highlighted milestones and make future searching 
+        easier.
+      operationId: addBookmark
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: "Unique identifier of the debug session."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [timestamp, title]
+              properties:
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: "When in the session this bookmark refers to."
+                  example: "2026-10-06T14:32:18Z"
+                title:
+                  type: string
+                  description: "Short title for the bookmark."
+                  example: "Root cause identified: thread pool exhaustion"
+                description:
+                  type: string
+                  description: "Optional longer explanation."
+                  example: "HikariCP pool maxed at 20, wait queue at 500ms+."
+                bookmarkType:
+                  type: string
+                  enum: [MILESTONE, ROOT_CAUSE, FIX_APPLIED, WARNING, DEAD_END, INSIGHT]
+                  description: "Category of the bookmark."
+                  example: "ROOT_CAUSE"
+      responses:
+        '201':
+          description: Bookmark added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Session is not active.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token issued to engineers and SREs."
+
+  schemas:
+    DebugSession:
+      type: object
+      required: [sessionId, title, engineerId, targetSystem, environment, status, startedAt, recordedSteps]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+          example: "9c8f1a3b-6d7e-4a12-8f5e-123456789abc"
+        title:
+          type: string
+          example: "Payment timeout investigation - 2026-10-06"
+        engineerId:
+          type: string
+          example: "amit.kumar@forgesphere.example.com"
+        engineerName:
+          type: string
+          example: "Amit Kumar"
+        targetSystem:
+          type: string
+          example: "payment-processor"
+        environment:
+          type: string
+          enum: [STAGING, PRODUCTION]
+          example: "PRODUCTION"
+        purpose:
+          type: string
+          example: "Investigating 5xx spike on /charge endpoint since 14:00 UTC."
+        incidentId:
+          type: string
+          example: "INC-2050"
+        status:
+          type: string
+          enum: [RECORDING, COMPLETED, ABORTED, TIMEOUT]
+          example: "COMPLETED"
+        captureMode:
+          type: string
+          enum: [COMMANDS_ONLY, COMMANDS_AND_OUTPUT, FULL_TERMINAL, SHELL_AND_HTTP]
+          example: "SHELL_AND_HTTP"
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        durationSeconds:
+          type: integer
+          example: 1245
+        recordedSteps:
+          type: array
+          description: "Chronological list of every action in the session."
+          items:
+            type: object
+            required: [stepId, stepNumber, stepType, timestamp, action]
+            properties:
+              stepId:
+                type: string
+                format: uuid
+                example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+              stepNumber:
+                type: integer
+                example: 12
+              stepType:
+                type: string
+                enum: [SHELL_COMMAND, SQL_QUERY, HTTP_CALL, KUBECTL_COMMAND, LOG_QUERY, METRIC_QUERY, NOTE, FILE_VIEW]
+                example: "SQL_QUERY"
+              timestamp:
+                type: string
+                format: date-time
+              action:
+                type: string
+                description: "The actual command or action."
+                example: "SELECT count(*) FROM payment_orders WHERE status='PENDING' AND created_at < NOW() - INTERVAL '5 min'"
+              target:
+                type: string
+                description: "Where the action was executed."
+                example: "payment-db-prod"
+              output:
+                type: string
+                description: "The captured output (redacted if enabled)."
+                example: "count: 42817"
+              durationMs:
+                type: integer
+                example: 245
+              exitCode:
+                type: integer
+                example: 0
+              error:
+                type: string
+              annotation:
+                type: string
+                description: "Optional note the engineer added inline."
+                example: "Normal backlog is <100; this confirms queue buildup."
+              bookmarked:
+                type: boolean
+                example: false
+              bookmarkId:
+                type: string
+                format: uuid
+        bookmarks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bookmark'
+        shareWith:
+          type: array
+          items:
+            type: string
+          example: ["payments-team", "sre-team@forgesphere.example.com"]
+        redactPatterns:
+          type: array
+          items:
+            type: string
+          example: ["password=.*", "token=.*"]
+        summary:
+          type: object
+          description: "AI-generated summary of the session."
+          properties:
+            rootCause:
+              type: string
+              example: "Thread pool exhaustion caused by slow downstream API."
+            fixApplied:
+              type: string
+              example: "Increased HikariCP pool from 20 to 50; added circuit breaker."
+            totalSteps:
+              type: integer
+              example: 42
+            deadEndsCount:
+              type: integer
+              description: "Number of paths investigated that led nowhere."
+              example: 3
+            timeToRootCauseMinutes:
+              type: integer
+              example: 18
+        recordedBy:
+          type: string
+          example: "amit.kumar@forgesphere.example.com"
+        auditReference:
+          type: string
+          example: "audit://debug-recorder/session-9c8f1a3b"
+
+    Bookmark:
+      type: object
+      required: [bookmarkId, sessionId, timestamp, title, bookmarkType, createdAt]
+      properties:
+        bookmarkId:
+          type: string
+          format: uuid
+          example: "b1a2c3d4-e5f6-7890-1234-567890abcdef"
+        sessionId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-10-06T14:32:18Z"
+        title:
+          type: string
+          example: "Root cause identified: thread pool exhaustion"
+        description:
+          type: string
+          example: "HikariCP pool maxed at 20, wait queue at 500ms+."
+        bookmarkType:
+          type: string
+          enum: [MILESTONE, ROOT_CAUSE, FIX_APPLIED, WARNING, DEAD_END, INSIGHT]
+          example: "ROOT_CAUSE"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          example: "amit.kumar@forgesphere.example.com"
+
+    SessionList:
+      type: object
+      required: [content, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            type: object
+            required: [sessionId, title, engineerId, targetSystem, status, startedAt, durationSeconds, totalSteps]
+            properties:
+              sessionId:
+                type: string
+                format: uuid
+              title:
+                type: string
+                example: "Payment timeout investigation - 2026-10-06"
+              engineerId:
+                type: string
+                example: "amit.kumar@forgesphere.example.com"
+              targetSystem:
+                type: string
+                example: "payment-processor"
+              environment:
+                type: string
+                enum: [STAGING, PRODUCTION]
+                example: "PRODUCTION"
+              status:
+                type: string
+                enum: [RECORDING, COMPLETED, ABORTED, TIMEOUT]
+                example: "COMPLETED"
+              startedAt:
+                type: string
+                format: date-time
+              durationSeconds:
+                type: integer
+                example: 1245
+              totalSteps:
+                type: integer
+                example: 42
+              bookmarksCount:
+                type: integer
+                example: 3
+              rootCauseSummary:
+                type: string
+                example: "Thread pool exhaustion caused by slow downstream API."
+              incidentId:
+                type: string
+                example: "INC-2050"
+              matchHighlights:
+                type: array
+                description: "Snippets of matched content from full-text search."
+                items:
+                  type: string
+                example:
+                  - "...HikariCP pool maxed at 20, wait queue at 500ms+..."
+                  - "...connection pool exhaustion confirmed via metrics..."
+        totalElements:
+          type: integer
+          example: 342
+        totalPages:
+          type: integer
+          example: 18
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+
+    ErrorResponse:
+      type: object
+      required: [status, message, timestamp, path]
+      properties:
+        status:
+          type: integer
+          example: 409
+        errorCode:
+          type: string
+          example: "SESSION_ALREADY_ACTIVE"
+        message:
+          type: string
+          example: "An active debug session already exists for this engineer."
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+          example: "/v1/sessions"
+        serviceTransactionId:
+          type: string
+          example: "523f52b2-64a5-465e-b245-3efbe78f70ae"
+
+  responses:
+    BadRequest:
+      description: Invalid request payload or missing required fields.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Session ID not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

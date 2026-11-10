@@ -1,0 +1,7 @@
+{
+  "artifactId": "production-debug-recorder",
+  "status": "MOCK_API_UNAVAILABLE",
+  "message": "Request failed with status code 401",
+  "endpointCount": 0,
+  "generatedAt": "2026-11-10T15:56:31.390Z"
+}
