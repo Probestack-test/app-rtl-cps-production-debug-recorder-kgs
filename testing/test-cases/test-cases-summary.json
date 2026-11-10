@@ -1,0 +1,6 @@
+{
+  "artifactId": "production-debug-recorder",
+  "status": "TEST_API_UNAVAILABLE",
+  "message": "Request failed with status code 401",
+  "generatedAt": "2026-11-10T15:56:31.363Z"
+}
